@@ -37,7 +37,7 @@ Unlike AI tools that hallucinate findings, Axiom agents **actually run real tool
 
 ```bash
 # 1. Clone
-git clone https://github.com/YOUR_USERNAME/axiom.git
+git clone https://github.com/ezzada/axiom.git
 cd axiom
 
 # 2. Install Python deps
