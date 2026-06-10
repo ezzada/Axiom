@@ -1,4 +1,4 @@
-# AXIOM — Professional AI Pentesting Suite
+# AXIOM — Professional AI Pentesting Suite (Clean Architecture)
 
 ```
  █████╗ ██╗  ██╗██╗ ██████╗ ███╗   ███╗
@@ -13,73 +13,88 @@
 
 ---
 
-## What is Axiom?
+## Overview
 
-Axiom is a multi-agent AI pentesting team built with [CrewAI](https://crewai.com). It gives **5 specialized AI agents** access to real Kali Linux security tools, orchestrates them in sequence, and produces professional pentest reports in PDF and Markdown.
+Axiom is a professional-grade multi-agent AI pentesting team built with a clean, scalable architecture using [LangGraph](https://langchain-ai.github.io/langgraph/). It orchestrates specialized AI agents that use real security tools to perform comprehensive security assessments and generate professional PDF/Markdown reports.
 
-Unlike AI tools that hallucinate findings, Axiom agents **actually run real tools** (`nmap`, `nikto`, `whatweb`, `searchsploit`, etc.) and analyze real output.
+### Key Features
+- **Real Tool Execution**: Unlike LLMs that hallucinate, Axiom runs actual tools (`nmap`, `nikto`, `whatweb`, `wafw00f`, `searchsploit`) and analyzes their raw outputs.
+- **Clean Architecture**: Rebuilt from the ground up for modularity, robustness, and ease of expansion.
+- **LangGraph Orchestration**: Uses state-of-the-art agentic workflows for precise control over the assessment lifecycle.
+- **Professional Reporting**: Generates branded PDF and Markdown reports suitable for stakeholders.
+- **Docker Ready**: Easy deployment with all system dependencies pre-configured.
 
 ---
 
-## The Team
+## Agent Capabilities
 
-| Agent | Role | Tools |
+| Agent | Focus | Tools |
 |---|---|---|
-| 🕵️ Recon Specialist | OSINT, attack surface mapping | `whois`, `dig`, `nmap`, `subfinder`, `theHarvester`, `crt.sh` |
-| 🌐 Web Analyst | OWASP Top 10, API security | `whatweb`, `nikto`, `curl`, `wafw00f`, `sslscan`, `gobuster` |
-| 🔌 Network Pentester | Ports, CVEs, lateral movement | `nmap --script vuln`, `smb-vuln`, `searchsploit`, `traceroute` |
-| 💥 Exploit Specialist | Attack chains, CVE analysis | `searchsploit` |
-| 📝 Report Writer | Professional PDF + Markdown report | ReportLab |
+| 🕵️ **Recon Agent** | Network Recon & Discovery | `nmap` (Service & Version Detection) |
+| 🌐 **Web Agent** | Application Security | `whatweb`, `wafw00f`, `nikto` |
+| 💥 **Exploit Agent** | Vulnerability & Exploit Research | `searchsploit` (ExploitDB integration) |
+| 📝 **Report Agent** | Synthesis & Remediation | `ReportLab` (PDF/Markdown Generation) |
+
+---
+
+## Prerequisites
+
+- **Python 3.11+**
+- **OpenRouter API Key** (Get one at [openrouter.ai](https://openrouter.ai/))
+- **Security Tools** (for local installation):
+  - `nmap`, `nikto`, `whatweb`, `wafw00f`, `exploitdb`
 
 ---
 
 ## Installation
 
+### Option 1: Docker (Recommended)
+Docker is the easiest way to run Axiom as it bundles all the required Kali Linux security tools.
+
 ```bash
-# 1. Clone
+# 1. Clone the repository
 git clone https://github.com/ezzada/axiom.git
 cd axiom
 
-# 2. Install Python deps
-pip install -r requirements.txt
+# 2. Create environment file
+cp .env.example .env
+# Edit .env and add your OPENROUTER_API_KEY
 
-# 3. Install Kali tools
-sudo apt install -y nmap nikto whatweb wafw00f sslscan gobuster \
-                    subfinder amass theharvester exploitdb wordlists
-
-# 4. Set your OpenRouter API key (free at openrouter.ai)
-export OPENROUTER_API_KEY=sk-or-v1-...
+# 3. Build and Run
+docker build -t axiom-suite .
+docker run -p 8501:8501 --env-file .env axiom-suite
 ```
 
-## Usage
+### Option 2: Local Installation
 
 ```bash
-# Streamlit UI (recommended)
-streamlit run axiom_ui.py
-# Opens at http://localhost:8501
+# 1. Install System Dependencies (Debian/Ubuntu/Kali)
+sudo apt update && sudo apt install -y nmap nikto whatweb wafw00f exploitdb curl
 
-# CLI
-python axiom.py
+# 2. Install Python Dependencies
+pip install -r requirements.txt
+
+# 3. Configure Environment
+cp .env.example .env
+# Edit .env and add your OPENROUTER_API_KEY
 ```
 
 ---
 
-## How It Works
+## Usage
 
+### Starting the Dashboard
+Run the Streamlit UI to access the main assessment dashboard:
+
+```bash
+streamlit run app.py
 ```
-Streamlit UI
-    │
-    ▼
-CrewAI Orchestrator
-    ├─▶ 🕵️ Recon Agent    ──▶ whois, dig, nmap, subfinder, theHarvester
-    ├─▶ 🌐 Web Agent       ──▶ whatweb, nikto, curl, wafw00f, gobuster
-    ├─▶ 🔌 Network Agent   ──▶ nmap vuln scripts, searchsploit, smb-scan
-    ├─▶ 💥 Exploit Agent   ──▶ searchsploit (CVE matching on real findings)
-    └─▶ 📝 Report Agent    ──▶ PDF + Markdown report
-              │
-              ▼
-        OpenRouter API (free LLM models, auto-fallback)
-```
+
+### Assessment Modes
+- **Full Audit**: The automated "one-click" mode. Runs Recon -> Web Analysis -> Exploit Research -> Reporting.
+- **Network Recon**: Focuses on discovering hosts, services, and open ports.
+- **Web Analysis**: Deep-dive into a web application's tech stack, WAF, and vulnerabilities.
+- **Exploit Research**: Cross-references discovered services against ExploitDB to find viable attack vectors.
 
 ---
 
@@ -87,32 +102,21 @@ CrewAI Orchestrator
 
 ```
 axiom/
-├── axiom_ui.py        # Streamlit web UI
-├── axiom_tools.py     # Real Kali Linux tool wrappers (16 tools)
-├── axiom.py           # CLI entry point
-├── requirements.txt   # Python dependencies
-├── .gitignore
-└── README.md
+├── agents/        # LangGraph agent definitions
+├── models/        # Pydantic v2 data models & state management
+├── tools/         # Robust subprocess tool wrappers
+├── utils/         # Reporting and helper utilities
+├── config/        # Pydantic Settings & environment config
+app.py             # Streamlit Dashboard UI
+Dockerfile         # Container configuration
+.env.example       # Environment template
 ```
 
 ---
 
-## LLM Models (Free, Auto-Fallback)
+## Legal & Compliance
 
-Axiom automatically switches models if one is rate-limited:
-
-1. `openai/gpt-oss-120b:free`
-2. `nvidia/nemotron-3-ultra-550b-a55b:free`
-3. `nvidia/nemotron-3-super-120b-a12b:free`
-4. `openai/gpt-oss-20b:free`
-5. `openrouter/owl-alpha:free`
-6. `openrouter/free` ← ultimate fallback
-
----
-
-## Legal
-
-For **authorized penetration testing only**. Always obtain explicit written authorization before testing. The authors are not responsible for misuse.
+This tool is for **authorized penetration testing only**. Always obtain explicit written authorization before testing. The authors and contributors are not responsible for misuse or damage caused by this tool.
 
 ---
 
