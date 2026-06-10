@@ -75,7 +75,7 @@ sudo apt update && sudo apt install -y nmap nikto whatweb wafw00f exploitdb curl
 pip install -r requirements.txt
 
 # 3. Configure Environment
-cp .env.example .env
+cp .env-example .env
 # Edit .env and add your OPENROUTER_API_KEY
 ```
 
