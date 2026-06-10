@@ -57,7 +57,7 @@ git clone https://github.com/ezzada/axiom.git
 cd axiom
 
 # 2. Create environment file
-cp .env.example .env
+cp .env-example .env
 # Edit .env and add your OPENROUTER_API_KEY
 
 # 3. Build and Run
@@ -109,7 +109,7 @@ axiom/
 ├── config/        # Pydantic Settings & environment config
 app.py             # Streamlit Dashboard UI
 Dockerfile         # Container configuration
-.env.example       # Environment template
+.env-example       # Environment template
 ```
 
 ---
