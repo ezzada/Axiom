@@ -12,19 +12,24 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nmap \
-    nikto \
     whatweb \
-    wafw00f \
-    exploitdb \
     gcc \
     python3-dev \
+    ruby \
+    git \
+    perl \
     curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Nikto via git (no Debian package in trixie)
+RUN git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto \
+    && ln -s /opt/nikto/program/nikto.pl /usr/local/bin/nikto \
+    && chmod +x /opt/nikto/program/nikto.pl
+
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt wafw00f exploitdb
 
 # Copy project files
 COPY . .
