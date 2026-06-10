@@ -1,4 +1,4 @@
-# AXIOM — Professional AI Pentesting Suite (Clean Architecture)
+# AXIOM — Professional AI Pentesting Suite
 
 ```
  █████╗ ██╗  ██╗██╗ ██████╗ ███╗   ███╗
